@@ -1,3 +1,4 @@
+import itertools
 import os
 from pandas_ods_reader import read_ods
 import networkx as nx
@@ -124,6 +125,7 @@ if __name__ == '__main__':
     print('General commands: load_graph, categories, subcategories, recipes, ingredients, exit')
     print('Class 2 node-centralities: degree, closeness, eigenvector, betweenneess, pagerank, closeness_vitality')
     print('Class 2 edge-centralities: edge_betwenness')
+    print('Class 5 community detection: girvan_newman, asyn_fluidc, asyn_lpa, k_clique, kernighan_lin')
     while(True):
         str = input('Type a command\n')
         line = str.split(" ")
@@ -213,6 +215,38 @@ if __name__ == '__main__':
             print('edge betweenness ', degree)
             continue
 
+        #Clase 5
+        if (command == "girvan_newman"):
+            comp = nx.community.girvan_newman(nx_graph)
+            k=4
+            limited = itertools.takewhile(lambda c: len(c) <= k, comp)
+            for comunities in limited:
+                print(tuple(sorted(c) for c in comunities))
+            continue
+
+        if (command=="asyn_fluidc"):
+            comp = nx.community.asyn_fluidc(nx_graph, 4)
+            for comunities in comp:
+                print(comunities)
+            continue
+        if (command=="asyn_lpa"):
+            comp = nx.community.asyn_lpa_communities(nx_graph)
+            k=4
+            for f in comp:
+                print(f)
+            continue
+
+        if (command=="k_clique"):
+            cmp = nx.community.k_clique_communities(nx_graph, 2) # con K>2 da solucion vacia
+            for f in cmp:
+                print(f)
+            continue
+
+        if (command== "kernighan_lin"):
+            (a,b) = nx.community.kernighan_lin_bisection(nx_graph, max_iter=100)
+            print(a)
+            print(b)
+            continue
 
         if (command == "exit"):
             break
