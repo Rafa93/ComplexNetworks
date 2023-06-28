@@ -83,9 +83,20 @@ if __name__ == '__main__':
             nx.write_graphml(nx_graph, "recipes.graphml")  #SALVA EL GRAFO
             matrix_tf_idf = build_matrix_tfidf(nx_graph) # CREA LA MATRIZ
 
+            # Separate by group
+            l, r = nx.bipartite.sets(nx_graph)
+            pos = {}
+
+            # Update position for node from each group
+            pos.update((node, (1, index)) for index, node in enumerate(l))
+            pos.update((node, (2, index)) for index, node in enumerate(r))
+
+            nx.draw_networkx(nx_graph, pos=pos, with_labels=False, node_size=20)
+            plt.show()
+
             top_nodes = {n for n, d in nx_graph.nodes(data=True) if d["bipartite"]==0} # recetas
             bottom_nodes = set(nx_graph) - top_nodes # ingredientes
-            nx.draw(nx_graph, node_size=90)
+            nx.draw_networkx(nx_graph, node_size=20, with_labels=False)
             plt.show()
             continue
 

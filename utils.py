@@ -11,7 +11,11 @@ def load_graph(path):
 def load_ods(path):
     ls = os.listdir(path)
     files = []
+    i = 0
     for file in ls:
+        if i == 4:
+            break
+        i+=1
         if file.__contains__('.ods'):
             real_path = path + "//" + file
             print(real_path)
@@ -20,7 +24,6 @@ def load_ods(path):
             ods_file = read_ods(real_path, 1, columns=['Ingrediente', 'Modificador', 'Cantidad', 'Medida', 'Medida Exacta',
                                                        'Opcional',    'Receta',      'Categoria','Subcategoria', 'Preparacion'])
             files.append(ods_file)
-        break
     return files
 
 
@@ -39,20 +42,24 @@ def ods_to_graph(ods_files):
             m = i['Modificador'][j]
             c = i['Cantidad'][j]
             me = i['Medida'][j]
-            mee = i['Medida Exacta'][j]
-            o = i['Opcional'][j]
+            if ('Medida Exacta' in i.keys()):
+                mee = i['Medida Exacta'][j]
+            if ('Opcional' in i.keys()):
+                o = i['Opcional'][j]
             rec = i['Receta'][j]
-            cat = i['Categoria'][j]
+            if ('Categoria' in i.keys()):
+                cat = i['Categoria'][j]
             subcat = i['Subcategoria'][j]
-            pre = i['Preparacion'][j]
+            if ('Preparacion' in i.keys()):
+                pre = i['Preparacion'][j]
 
             # UTILIZAR Ingredientes y Recetas
-            if ing not in ingredients_set:
+            if ing != None and ing not in ingredients_set:
                 ingredients_set.add(ing)
                 B.add_nodes_from([ing], bipartite=1)
 
             # las recetas pertenecen a una categoria y subcategoria
-            if rec not in recipes_set:
+            if rec != None and rec not in recipes_set:
                 recipes_set.add(rec)
                 B.add_nodes_from([rec], bipartite=0)
 
@@ -67,7 +74,8 @@ def ods_to_graph(ods_files):
 
 
             #Añadir arista
-            B.add_edges_from([(ing, rec)])
+            if rec != None and rec != None:
+                B.add_edges_from([(ing, rec)])
 
     return B, categories_sub_recipes
 
@@ -97,7 +105,7 @@ def print_subcat(categories):
 def paint_graph(graph, val_map):
 
     values = [value for key,value in val_map]
-    nx.draw(graph, cmap=plt.get_cmap('viridis'),node_size=90, node_color=values, with_labels=False, font_color='white')
+    nx.draw_networkx(graph, cmap=plt.get_cmap('viridis'),node_size=20, node_color=values, with_labels=False, font_color='white')
     plt.show()
 
 def paint_edged_graph(graph, edge_weights):
@@ -106,5 +114,5 @@ def paint_edged_graph(graph, edge_weights):
         d['weight'] = edge_weights[(u,v)]
 
     edges, weights = zip(*nx.get_edge_attributes(graph, 'weight').items())
-    nx.draw(graph, node_color='w', node_size=70, edge_color= weights)
+    nx.draw(graph, node_color='w', node_size=20, edge_color= weights)
     plt.show()
